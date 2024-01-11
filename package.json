@@ -6,7 +6,11 @@
     "build": "npm test",
     "test": "eslint . && jest",
     "test:watch": "nodemon --exec jest",
+    "test:api-domibus": "jest --testPathIgnorePatterns /node_modules/ testIntegration/*",
     "start": "node server.js"
+  },
+  "jest": {
+    "testPathIgnorePatterns": [ "/node_modules/", "/testIntegration/" ]
   },
   "author": "",
   "license": "Apache-2.0",
