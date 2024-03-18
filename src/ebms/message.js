@@ -1,10 +1,11 @@
+const PieceJointeVide = require('./pieceJointeVide');
+
 class Message {
   constructor(config, donnees) {
     this.adaptateurUUID = config.adaptateurUUID;
     this.horodateur = config.horodateur;
 
-    this.idPieceJointe = donnees.idPieceJointe;
-    this.contenuPieceJointe = donnees.contenuPieceJointe;
+    this.pieceJointe = donnees.pieceJointe || new PieceJointeVide();
 
     const suffixe = process.env.SUFFIXE_IDENTIFIANTS_DOMIBUS;
     this.idPayload = `cid:${this.adaptateurUUID.genereUUID()}@${suffixe}`;
@@ -13,6 +14,8 @@ class Message {
       { ...donnees, idPayload: this.idPayload },
     );
   }
+
+  pieceJointePresente = () => this.pieceJointe.constructor.name === 'PieceJointe';
 
   enSOAP() {
     const messageEnBase64 = Buffer.from(this.corpsMessageEnXML()).toString('base64');
@@ -34,22 +37,10 @@ class Message {
       <payload payloadId="${this.idPayload}" contentType="application/x-ebrs+xml">
         <value>${messageEnBase64}</value>
       </payload>
-      ${this.pieceJointe()}
+      ${this.pieceJointe.enXMLDansCorps()}
     </_1:submitRequest>
   </soap:Body>
 </soap:Envelope>
-    `;
-  }
-
-  pieceJointe() {
-    if (typeof this.idPieceJointe === 'undefined') {
-      return '';
-    }
-
-    return `
-<payload payloadId="${this.idPieceJointe}">
-  <value>${this.contenuPieceJointe}</value>
-</payload>
     `;
   }
 }
